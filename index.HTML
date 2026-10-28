@@ -15,6 +15,29 @@
 <body>
   <div id="map"></div>
 
+<div id="controls" style="
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 1;
+  background: white;
+  padding: 12px;
+  border-radius: 5px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+">
+  <button id="showAllBuildingsButton">Show All Buildings</button>
+
+  <span style="display: inline-block; width: 15px;"></span>
+
+  <input
+    type="text"
+    id="highlightBuildingsTextEntry"
+    placeholder="e.g. Student Union"
+  >
+
+  <button id="highlightBuildingsButton">Highlight</button>
+</div>
+
   <script>
     const map = new maplibregl.Map({
       container: 'map',
@@ -60,6 +83,67 @@ function onEachBuilding(e) {
       .addTo(map);
   }
 }
+
+map.on('load', function () {
+  const showAllButton = document.getElementById(
+    'showAllBuildingsButton'
+  );
+
+  const highlightButton = document.getElementById(
+    'highlightBuildingsButton'
+  );
+
+  const buildingInput = document.getElementById(
+    'highlightBuildingsTextEntry'
+  );
+
+  // Show all buildings in their original style
+  function showAllBuildings() {
+    map.setFilter('ubc', null);
+  }
+
+  // Highlight buildings whose names contain the search text
+  function highlightBuildings() {
+    const searchText = buildingInput.value.trim();
+
+    if (!searchText) {
+      showAllBuildings();
+      return;
+    }
+
+    map.setFilter('ubc', [
+      'match',
+      ['to-string', ['get', 'NAME']],
+      [''],
+      false,
+      true
+    ]);
+
+    // Filter names using a case-insensitive substring match
+    map.setFilter('ubc', [
+      'case',
+      [
+        '!=',
+        ['index-of', searchText.toLowerCase(),
+          ['downcase', ['to-string', ['get', 'NAME']]]
+        ],
+        -1
+      ],
+      true,
+      false
+    ]);
+  }
+
+  showAllButton.addEventListener('click', showAllBuildings);
+  highlightButton.addEventListener('click', highlightBuildings);
+
+  // Allow Enter to run the search
+  buildingInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+      highlightBuildings();
+    }
+  });
+});
   </script>
 </body>
 </html>
