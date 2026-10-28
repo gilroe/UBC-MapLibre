@@ -32,7 +32,7 @@
   <input
     type="text"
     id="highlightBuildingsTextEntry"
-    placeholder="e.g. Student Union"
+    placeholder="e.g. Academic"
   >
 
   <button id="highlightBuildingsButton">Highlight</button>
@@ -125,7 +125,7 @@ map.on('load', function () {
       [
         '!=',
         ['index-of', searchText.toLowerCase(),
-          ['downcase', ['to-string', ['get', 'NAME']]]
+          ['downcase', ['to-string', ['get', 'BLDG_USAGE']]]
         ],
         -1
       ],
